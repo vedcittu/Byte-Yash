@@ -1,0 +1,144 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+  background-color: #000000;
+}
+
+/* Hero */
+/* Hero Section */
+.hero {
+      background: url('back.png') no-repeat center/cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+.hero h1 {
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 4rem);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ffffff, #22d3ee, #2f44ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeInDown 1.5s ease, glow 2s ease-in-out infinite alternate;
+}
+
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  margin-top: 1rem;
+  color: #ffffff;
+  animation: fadeInUp 2s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+@keyframes fadeInDown {
+  from {opacity:0; transform:translateY(-60px);}
+  to {opacity:1; transform:translateY(0);}
+}
+@keyframes fadeInUp {
+  from {opacity:0; transform:translateY(60px);}
+  to {opacity:1; transform:translateY(0);}
+}
+.shops{
+  background-color: #f1f9f7;
+}
+
+/* Flying Cards */
+.flying-card {
+  background: #4a5059;
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: #060000;
+  transition: transform .6s ease, box-shadow .6s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.flying-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 70%);
+  transform: rotate(25deg);
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.flying-card:hover {
+  transform: translateY(-20px) scale(1.05);
+  box-shadow: 0 25px 50px rgb(255, 0, 0);
+}
+.flying-card:hover::before {
+  opacity: 1;
+}
+
+
+/* Chatbot */
+.btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #4ade80;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+#chatbot {
+  height: 400px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: #f1f9f7;
+  padding: 1rem;
+}
+.chat-bubble {
+  max-width: 70%;
+  margin: .5rem 0;
+  padding: .75rem 1rem;
+  border-radius: 15px;
+  animation: fadeIn .3s ease-in;
+}
+.chat-bubble.user { background: #007bff; color: #fff; margin-left:auto; }
+.chat-bubble.bot { background: #007df9; color: #000; margin-right:auto; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+/* Alerts */
+.alert-box {
+  background: #fff;
+  border-left: 5px solid #dc3545;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+footer {
+  background: #007b5e;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+}
+}
+.text-muted{
+  color: #fff;
+  background: linear-gradient(90deg, #ffffff, #22d3ee, #2f44ff)
+
+}
+.heroo{
+  display: inline;
+}
+.ved{
+  background-image: url(https://thumbs.dreamstime.com/b/world-hepatitis-day-awareness-calendar-date-circled-yellow-to-emphasize-liver-health-ai-generated-315873975.jpg);
+}

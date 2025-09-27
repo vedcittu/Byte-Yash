@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health Alerts</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(to bottom right, #fee2e2, #ffedd5); color: #333; }
+    section { padding: 60px 20px; max-width: 1200px; margin: auto; }
+    h2 { font-size: 2.5rem; font-weight: bold; text-align: center; margin-bottom: 15px; }
+    p.subtitle { text-align: center; font-size: 1.1rem; color: #555; max-width: 700px; margin: 0 auto 30px; }
+
+    .controls { display: grid; gap: 10px; grid-template-columns: 1fr; margin-bottom: 20px; }
+    @media(min-width: 768px){ .controls { grid-template-columns: 2fr 1fr 1fr; } }
+    .search-wrap { display:flex; gap:8px; }
+    .search-wrap input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid #d1d5db; }
+    .search-wrap button { padding:10px 16px; border-radius:10px; border:none; cursor:pointer; background:#2563eb; color:#fff; }
+    .inline-actions { display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+    .inline-actions select, .inline-actions button { padding:10px 12px; border-radius:10px; border:1px solid #d1d5db; background:#fff; cursor:pointer; }
+    .inline-actions button.primary { background:#2563eb; color:#fff; border:none; }
+
+    .filters { display:flex; justify-content:center; gap:12px; margin: 10px 0 30px; flex-wrap:wrap; }
+    .filters button { padding: 10px 20px; border-radius: 999px; border: 1px solid #d1d5db; cursor: pointer; font-weight: 500; background: #fff; color: #333; transition: 0.3s; }
+    .filters button.active { background: #2563eb; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border-color:#2563eb; }
+    .filters button:hover { background: #e0f2fe; }
+
+    .alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .alert-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 20px; transition: 0.3s; }
+    .alert-card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .alert-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .alert-icon { padding: 8px; border-radius: 8px; font-size: 1.2rem; }
+    .severity { padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: bold; }
+    .high { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .medium { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .low { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-card p { margin: 10px 0; color: #555; line-height: 1.5; }
+    .alert-footer { display: flex; justify-content: space-between; font-size: 0.9rem; color: #666; gap:8px; flex-wrap:wrap; }
+    .tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .tag { font-size: 0.75rem; padding: 4px 8px; border-radius: 999px; background:#f3f4f6; border:1px solid #e5e7eb; color:#374151; }
+
+    .progress { height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; position:relative; }
+    .progress .bar { height: 100%; border-radius: 4px; }
+    .bar.high { width: 100%; background: #ef4444; }
+    .bar.medium { width: 70%; background: #facc15; }
+    .bar.low { width: 40%; background: #22c55e; }
+
+    .card-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .btn { padding:8px 12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer; }
+    .btn.warn { background:#fff7ed; border-color:#fdba74; color:#9a3412; }
+    .btn.ghost { background:#fff; border-color:#e5e7eb; color:#374151; }
+    .btn.primary { background:#2563eb; color:#fff; border:none; }
+
+    .helpline { background: linear-gradient(to right, #dc2626, #db2777); padding: 40px; border-radius: 16px; text-align: center; color: #fff; }
+    .helpline h3 { font-size: 1.8rem; margin-bottom: 20px; }
+    .helpline-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; }
+    .helpline-grid div { text-align: center; }
+    .helpline-grid p { margin: 4px 0; }
+    .helpline-grid .number { font-size: 2rem; font-weight: bold; }
+    .helpline-actions { margin-top:16px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+
+    .info { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin: 10px 0 20px; color:#374151; }
+    .pill { padding:6px 10px; border-radius:999px; background:#fff; border:1px solid #d1d5db; }
+    .muted { color:#6b7280; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <section id="alerts">
+    <h2>Real-Time Health Alerts</h2>
+    <p class="subtitle">Stay informed about health emergencies, outbreaks, and advisories; filter by severity, location, or keyword and sort by date or city.</p>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search by city, disease, or text (e.g., dengue, Delhi, waterborne)"/>
+        <button id="clearSearch" type="button" title="Clear search">Clear</button>
+      </div>
+      <div class="inline-actions">
+        <select id="sortSelect" title="Sort alerts">
+          <option value="date_desc">Sort: Date (newest)</option>
+          <option value="date_asc">Sort: Date (oldest)</option>
+          <option value="city_asc">Sort: City (A–Z)</option>
+          <option value="city_desc">Sort: City (Z–A)</option>
+          <option value="severity_desc">Sort: Severity (High→Low)</option>
+          <option value="severity_asc">Sort: Severity (Low→High)</option>
+        </select>
+        <button id="restoreAll" class="primary" type="button" title="Restore dismissed alerts">Restore dismissed</button>
+      </div>
+    </div>
+
+    <div class="filters" role="tablist" aria-label="Severity filters">
+      <button class="active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button data-filter="high" role="tab" aria-selected="false">High</button>
+      <button data-filter="medium" role="tab" aria-selected="false">Medium</button>
+      <button data-filter="low" role="tab" aria-selected="false">Low</button>
+    </div>
+
+    <div class="info">
+      <span id="countInfo" class="pill">Showing 0 alerts</span>
+      <span class="muted">Tip: Click a tag to filter by topic.</span>
+    </div>
+
+    <div id="alertsGrid" class="alerts" aria-live="polite"></div>
+
+    <div class="helpline" aria-labelledby="help-title">
+      <h3 id="help-title">Emergency Health Helpline</h3>
+      <div class="helpline-grid">
+        <div><p>Medical Emergency</p><p class="number">102</p></div>
+        <div><p>Ambulance Service</p><p class="number">108</p></div>
+        <div><p>National Emergency</p><p class="number">112</p></div>
+      </div>
+      <div class="helpline-actions">
+        <!-- Copy button removed -->
+        <button type="button" class="btn ghost" id="saveHelplines">Save as contact (.vcf)</button>
+      </div>
+      <p class="muted" style="margin-top:10px;">These emergency numbers are commonly provided across India, with 112 as the unified helpline under ERSS; verify locally if needed.</p>
+    </div>
+  </section>
+
+  <script>
+    const alerts = [
+      { id: 1, title: "Dengue Fever Alert", severity: "high", city: "Mumbai", state: "Maharashtra", date: "2025-09-17", icon: "⚠", text: "Increased dengue cases; prevent mosquito breeding and seek care for fever.", tags: ["vector-borne","dengue","monsoon"] },
+      { id: 2, title: "Air Quality Advisory", severity: "medium", city: "Delhi", state: "NCR", date: "2025-09-17", icon: "📈", text: "Poor AQI; people with respiratory conditions should limit outdoor activity.", tags: ["air","AQI","respiratory"] },
+      { id: 3, title: "COVID-19 Vaccination Drive", severity: "low", city: "Bengaluru", state: "Karnataka", date: "2025-09-17", icon: "🔔", text: "Free booster doses at government health centers.", tags: ["covid-19","vaccination","immunization"] },
+      { id: 4, title: "Waterborne Disease Alert", severity: "high", city: "Kolkata", state: "West Bengal", date: "2025-09-17", icon: "⚠", text: "Cholera/diarrhea reported; purify water and maintain hygiene.", tags: ["water","cholera","diarrhea"] },
+      { id: 5, title: "Waterborne Disease Alert", severity: "high", city: "Mumbai", state: "Maharashtra", date: "2025-09-17", icon: "⚠", text: "Cholera/diarrhea reported; ensure safe drinking water.", tags: ["water","cholera"] },
+      { id: 6, title: "Malaria Alert", severity: "high", city: "Kanpur", state: "Uttar Pradesh", date: "2025-01-21", icon: "⚠", text: "Malaria cases; use ITNs, control mosquitoes, and seek care for fever/chills.", tags: ["vector-borne","malaria"] }
+    ];
+
+    let currentSeverity = "all";
+    let query = "";
+    let sortMode = "date_desc";
+    const dismissed = new Set();
+
+    const sevWeight = { high: 3, medium: 2, low: 1 };
+
+    const grid = document.getElementById("alertsGrid");
+    const countInfo = document.getElementById("countInfo");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearch");
+    const sortSelect = document.getElementById("sortSelect");
+    const restoreAllBtn = document.getElementById("restoreAll");
+    const exportJSONBtn = document.getElementById("exportJSON");
+    const exportCSVBtn = document.getElementById("exportCSV");
+
+    function render() {
+      const q = query.trim().toLowerCase();
+      let list = alerts.filter(a => !dismissed.has(a.id));
+
+      if (currentSeverity !== "all") list = list.filter(a => a.severity === currentSeverity);
+      if (q) {
+        list = list.filter(a =>
+          a.title.toLowerCase().includes(q) ||
+          a.text.toLowerCase().includes(q) ||
+          a.city.toLowerCase().includes(q) ||
+          a.state.toLowerCase().includes(q) ||
+          (a.tags || []).some(t => t.toLowerCase().includes(q))
+        );
+      }
+
+      list.sort((a, b) => {
+        if (sortMode === "date_desc") return b.date.localeCompare(a.date);
+        if (sortMode === "date_asc") return a.date.localeCompare(b.date);
+        if (sortMode === "city_asc") return a.city.localeCompare(b.city);
+        if (sortMode === "city_desc") return b.city.localeCompare(a.city);
+        if (sortMode === "severity_desc") return (sevWeight[b.severity] - sevWeight[a.severity]);
+        if (sortMode === "severity_asc") return (sevWeight[a.severity] - sevWeight[b.severity]);
+        return 0;
+      });
+
+      grid.innerHTML = "";
+      list.forEach(renderCard);
+      countInfo.textContent = `Showing ${list.length} alert${list.length !== 1 ? "s" : ""}`;
+    }
+
+    function renderCard(a) {
+      const barClass = a.severity === "high" ? "high" : a.severity === "medium" ? "medium" : "low";
+      const severityLabel = a.severity.toUpperCase();
+      const wrapper = document.createElement("div");
+      wrapper.className = "alert-card";
+      wrapper.setAttribute("tabindex", "0");
+      wrapper.innerHTML = `
+        <div class="alert-header">
+          <div class="alert-icon ${a.severity}">${a.icon}</div>
+          <span class="severity ${a.severity}" aria-label="Severity ${severityLabel}">${severityLabel}</span>
+        </div>
+        <h3>${a.title}</h3>
+        <p>${a.text}</p>
+        <div class="alert-footer">
+          <span>📍 ${a.city}, ${a.state}</span>
+          <span>📅 ${formatDate(a.date)}</span>
+        </div>
+        <div class="tags">
+          ${(a.tags || []).map(t => `<button type="button" class="tag" data-tag="${t}">${t}</button>`).join("")}
+        </div>
+        <div class="progress" role="progressbar" aria-label="Risk level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${barClass === "high" ? 100 : barClass === "medium" ? 70 : 40}">
+          <div class="bar ${barClass}"></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn warn" data-dismiss="${a.id}" title="Dismiss this alert">Dismiss</button>
+          <!-- Copy button removed -->
+          <a class="btn primary" href="https://www.google.com/search?q=${encodeURIComponent(a.title + ' ' + a.city)}" target="_blank" rel="noopener">Learn more</a>
+          <button class="btn ghost" data-share="${a.id}" title="Share alert">Share</button>
+        </div>
+      `;
+      grid.appendChild(wrapper);
+    }
+
+    function formatDate(iso) {
+      const [y, m, d] = iso.split("-").map(Number);
+      return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`;
+    }
+
+    document.querySelectorAll(".filters button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filters button").forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected","true");
+        currentSeverity = btn.dataset.filter;
+        render();
+      });
+    });
+
+    searchInput.addEventListener("input", () => { query = searchInput.value; render(); });
+    clearSearchBtn.addEventListener("click", () => { searchInput.value = ""; query = ""; render(); searchInput.focus(); });
+
+    sortSelect.addEventListener("change", () => { sortMode = sortSelect.value; render(); });
+
+    grid.addEventListener("click", (e) => {
+      const tagBtn = e.target.closest(".tag");
+      if (tagBtn) { searchInput.value = tagBtn.dataset.tag; query = searchInput.value; render(); return; }
+
+      const dismissBtn = e.target.closest("[data-dismiss]");
+      const shareBtn = e.target.closest("[data-share]");
+      if (dismissBtn) {
+        const id = Number(dismissBtn.dataset.dismiss);
+        dismissed.add(id);
+        render();
+      } else if (shareBtn && navigator.share) {
+        const id = Number(shareBtn.dataset.share);
+        const a = alerts.find(x => x.id === id);
+        navigator.share({ title: a.title, text: `${a.title} in ${a.city}: ${a.text}`, url: location.href }).catch(()=>{});
+      } else if (shareBtn) {
+        alert("Web Share not supported in this browser.");
+      }
+    });
+
+    restoreAllBtn.addEventListener("click", () => { dismissed.clear(); render(); });
+
+    function safeCSV(s){ return '"' + String(s).replace(/"/g,'""') + '"'; }
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], {type});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // Removed: copyHelplines handler
+
+    document.getElementById("saveHelplines").addEventListener("click", () => {
+      const vcf = [
+        "BEGIN:VCARD","VERSION:3.0","N:Emergency;India;;;","FN:India Emergency",
+        "TEL;TYPE=VOICE,WORK:PREF:112","TEL;TYPE=VOICE,WORK:108","TEL;TYPE=VOICE,WORK:102","END:VCARD"
+      ].join("\n");
+      downloadBlob(vcf, "india-emergency.vcf", "text/vcard");
+    });
+
+
+  </script>
+
+
+
+
+
+
+  <!-- VOICE MODE WIDGET -->
+  <vapi-widget
+    assistant-id="8d864d4c-8307-4c22-b005-123c31092d5e"
+    public-key="3d40ce45-f138-4af9-9421-84f9d74f4b61"
+    
+    mode="voice"
+    style="width: 80px; height: 80px; position: fixed; bottom: 20px; left: 5px; z-index: 9999;"
+  ></vapi-widget>
+
+  <!-- Vapi Script Loader -->
+  <script
+    src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
+    async
+    type="text/javascript"
+  ></script>
+
+
+
+
+
+
+
+</body>
+</html>
